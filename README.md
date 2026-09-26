@@ -46,7 +46,7 @@ Observed verification scope:
 
 These results do **not** establish universal LLM compliance, future-run reproducibility, provider-wide behavior, assessment quality, educational validity, fairness, answer correctness, or standards alignment.
 
-See `docs/NEPM_US_Edition_v1_0_Verification_Record.docx` for the detailed verification record. The record preserves the verified-candidate provenance: **v0.7 RC5 Candidate → v1.0 release with unchanged tested application logic**.
+See [NEPM US Edition v1.0 — Release Verification Record (PDF)](docs/NEPM_US_Edition_v1_0_Release_Verification_Record.pdf) for the detailed verification record. The record preserves the verified-candidate provenance: **v0.7 RC5 Candidate → v1.0 release with unchanged tested application logic**.
 
 ## Known boundaries
 
@@ -64,7 +64,7 @@ nepm-us-edition/
 ├── README.md
 ├── LICENSE
 └── docs/
-    └── NEPM_US_Edition_v1_0_Verification_Record.docx
+    └── NEPM_US_Edition_v1_0_Release_Verification_Record.pdf
 ```
 
 ## License
@@ -74,6 +74,13 @@ Copyright © 2026 N. Nakata
 NEPM US Edition is licensed under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**. See `LICENSE` for details.
 
 This license notice applies to the NEPM US Edition materials distributed in this repository. It is not a claim by N. Nakata to ownership of user-created or AI-generated assessment content merely because that content was produced using this workflow.
+
+## Contact
+
+For questions or feedback about NEPM US Edition:
+
+N. Nakata
+Email: nepm.prompt.ai@gmail.com
 
 ## Disclaimer
 
