@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<!--
+NEPM US Edition v1.0
+Copyright © 2026 N. Nakata
+Licensed under CC BY-NC-SA 4.0
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEPM US Edition v1.0 - Teacher-Controlled AI Assessment Workflow</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #cbd5e1;
+      --notice-bg: #fefce8;
+      --notice-border: #fef08a;
+      --notice-text: #713f12;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --success-text: #166534;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-note {
+      font-size: 0.75rem !important;
+      color: var(--text-muted);
+      margin-top: 6px !important;
+    }
+
+    .badge {
+      background-color: #e0e7ff;
+      color: #3730a3;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .notice-box {
+      background-color: var(--notice-bg);
+      border: 1px solid var(--notice-border);
+      color: var(--notice-text);
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+    }
+
+    .notice-box ul {
+      margin-left: 18px;
+      margin-top: 6px;
+    }
+
+    .notice-box li {
+      margin-bottom: 4px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .required {
+      color: #dc2626;
+    }
+
+    select,
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: #fff;
+      color: var(--text);
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: 2px solid var(--primary);
+      border-color: transparent;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8125rem;
+      font-weight: normal;
+      cursor: pointer;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .output-area {
+      margin-top: 12px;
+    }
+
+    textarea.readonly-output {
+      background-color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8125rem;
+      resize: vertical;
+    }
+
+    .instruction-box {
+      background-color: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 0.8125rem;
+      margin-bottom: 12px;
+    }
+
+    .instruction-box ol {
+      margin-left: 18px;
+      margin-top: 4px;
+    }
+
+    .instruction-box li {
+      margin-bottom: 4px;
+    }
+
+    .export-note {
+      background-color: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      margin-top: 8px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .copy-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 4px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>NEPM US Edition</h1>
+      <p>Educator Assistant for Structured Assessment Generation</p>
+      <p class="header-note">
+        A teacher-controlled workflow for using AI to build and review assessments.
+      </p>
+    </div>
+    <span class="badge">v1.0</span>
+  </div>
+
+  <!-- PRIVACY & SAFETY NOTICE -->
+  <div class="notice-box">
+    <strong>Privacy & Safety Notice:</strong>
+    <ul>
+      <li>Do NOT enter student names, IDs, IEP/504 details, or any PII (Personally Identifiable Information).</li>
+      <li>Designed for privacy-conscious workflows. Prompts generated are subject to your external AI provider's terms.</li>
+      <li>Educators maintain sole responsibility for reviewing and approving all generated assessment materials.</li>
+      <li>This tool is not affiliated with or endorsed by the College Board, ETS, or any testing agency.</li>
+    </ul>
+  </div>
+
+  <!-- SETUP FORM -->
+  <div class="card">
+    <h2>1. Assessment Setup</h2>
+
+    <div class="form-row form-group">
+      <div>
+        <label for="gradeBand">
+          Grade Band <span class="required">*</span>
+        </label>
+        <select id="gradeBand" onchange="invalidateState()">
+          <option value="Elementary (K–5)">Elementary (K–5)</option>
+          <option value="Middle (6–8)" selected>Middle (6–8)</option>
+          <option value="High (9–12)">High (9–12)</option>
+          <option value="Other / Teacher-Specified">Other / Teacher-Specified</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="purpose">
+          Purpose <span class="required">*</span>
+        </label>
+        <select id="purpose" onchange="invalidateState()">
+          <option value="Practice">Practice</option>
+          <option value="Formative" selected>Formative</option>
+          <option value="Test Prep">Test Prep</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="subjectTopic">
+        Subject & Topic <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="subjectTopic"
+        placeholder="e.g., Math: Solving linear equations"
+        oninput="invalidateState()"
+      >
+    </div>
+    
+    <div class="form-group">
+      <label for="targetDok">
+        Target DOK (Optional)
+      </label>
+      <select id="targetDok" onchange="invalidateState()">
+        <option value="Not Specified" selected>Not Specified</option>
+        <option value="DOK 1 — Recall & Reproduction">DOK 1 — Recall & Reproduction</option>
+        <option value="DOK 2 — Skills & Concepts">DOK 2 — Skills & Concepts</option>
+        <option value="DOK 3 — Strategic Thinking">DOK 3 — Strategic Thinking</option>
+        <option value="DOK 4 — Extended Thinking">DOK 4 — Extended Thinking</option>
+      </select>
+      <div class="hint">
+        DOK reflects the depth of thinking required, not simply how difficult a question is.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Accommodations (Optional)</label>
+      <div class="checkbox-grid">
+        <label class="checkbox-label">
+          <input type="checkbox" id="accVocab" value="Reduced Vocabulary" onchange="invalidateState()">
+          Reduced Vocabulary
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="accPlain" value="Plain Language" onchange="invalidateState()">
+          Plain Language
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="accOptions" value="Reduced Number of Answer Options" onchange="invalidateState()">
+          Reduced Number of Answer Options
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="accVisual" value="Visual Scaffolding" onchange="invalidateState()">
+          Visual Scaffolding
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="targetStandard">
+        Target Standard (Optional)
+      </label>
+      <input
+        type="text"
+        id="targetStandard"
+        placeholder="e.g., CCSS.MATH.CONTENT.8.EE.C.7 (Leave blank if none)"
+        oninput="invalidateState()"
+      >
+      <div class="hint">
+        If left blank, AI will NOT invent standard codes.
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn"
+      onclick="generatePhase1Prompt()"
+    >
+      Generate Phase 1 Prompt (Teacher Master Sheet)
+    </button>
+  </div>
+
+  <!-- PHASE 1 OUTPUT -->
+  <div class="card" id="phase1Card" style="display: none;">
+    <h2>2. Phase 1 Prompt (Master Sheet)</h2>
+    <div class="instruction-box">
+      <strong>Workflow Steps:</strong>
+      <ol>
+        <li>Copy the generated prompt below and paste it into ChatGPT, Claude, or Gemini (Keep Phase 1 and Phase 2 in the same chat session).</li>
+        <li>Review the AI-generated Master Sheet carefully. Request any revisions directly in the chat.</li>
+        <li>Once satisfied, type <strong>APPROVE</strong> to finalize the Master Sheet. (Note: Do not generate the Student Sheet yet).</li>
+      </ol>
+    </div>
+    <div class="output-area">
+      <textarea
+        id="phase1Output"
+        class="readonly-output"
+        rows="12"
+        readonly
+      ></textarea>
+      <button
+        type="button"
+        class="btn"
+        style="margin-top: 8px;"
+        onclick="copyToClipboard('phase1Output', 'copyStatus1')"
+      >
+        Copy Phase 1 Prompt
+      </button>
+      <div id="copyStatus1" class="copy-status">
+        Copied to clipboard!
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 GENERATOR -->
+  <div class="card">
+    <h2>3. Phase 2: Generate Student Test Sheet</h2>
+    <div class="instruction-box">
+      <strong>Human Approval Gate:</strong>
+      Paste the finalized Teacher Master Sheet that you reviewed and approved. The educator is responsible for confirming that the pasted content is the intended approved Master Sheet. The system checks only minimum structural signals before generating the Phase 2 prompt. This step generates the authorization prompt for Phase 2.
+    </div>
+
+    <div class="form-group">
+      <label for="masterSheetInput">
+        Paste Finalized Teacher Master Sheet
+        <span class="required">*</span>
+      </label>
+      <textarea
+        id="masterSheetInput"
+        rows="6"
+        placeholder="Paste the full, approved Teacher's Master Sheet content here..."
+        oninput="invalidatePhase2()"
+      ></textarea>
+    </div>
+
+    <button
+      type="button"
+      class="btn"
+      onclick="generatePhase2Prompt()"
+    >
+      Generate Phase 2 Prompt (Student Sheet)
+    </button>
+
+    <div
+      class="output-area"
+      id="phase2OutputArea"
+      style="display: none; margin-top: 16px;"
+    >
+      <textarea
+        id="phase2Output"
+        class="readonly-output"
+        rows="10"
+        readonly
+      ></textarea>
+      <button
+        type="button"
+        class="btn"
+        style="margin-top: 8px;"
+        onclick="copyToClipboard('phase2Output', 'copyStatus2')"
+      >
+        Copy Phase 2 Prompt
+      </button>
+      <div id="copyStatus2" class="copy-status">
+        Copied to clipboard!
+      </div>
+      <div class="export-note">
+        📄
+        <strong>Classroom Printing Tip:</strong>
+        Once the AI outputs the final Student Sheet, copy and paste the text directly into Google Docs or Microsoft Word for formatting and printing.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>NEPM US Edition v1.0 | Designed for Privacy-Conscious Workflows</p>
+    <p>Human review required prior to classroom distribution.</p>
+    <p>Copyright © 2026 N. Nakata</p>
+    <p>Licensed under CC BY-NC-SA 4.0</p>
+  </div>
+
+</div>
+
+<script>
+  // State Lock variable to snapshot Phase 1 parameters
+  let currentPhase1Data = null;
+
+  // Invalidate the locked state if the user modifies setup parameters after generation
+  function invalidateState() {
+    currentPhase1Data = null;
+    document.getElementById('phase1Output').value = '';
+    document.getElementById('phase1Card').style.display = 'none';
+    document.getElementById('phase2Output').value = '';
+    document.getElementById('phase2OutputArea').style.display = 'none';
+  }
+
+  // Invalidate Phase 2 Artifact if the user modifies the master sheet input
+  function invalidatePhase2() {
+    document.getElementById('phase2Output').value = '';
+    document.getElementById('phase2OutputArea').style.display = 'none';
+  }
+
+  function getSelectedAccommodations() {
+    const accs = [];
+    if (document.getElementById('accVocab').checked) accs.push('Reduced Vocabulary');
+    if (document.getElementById('accPlain').checked) accs.push('Plain Language');
+    if (document.getElementById('accOptions').checked) accs.push('Reduced Number of Answer Options');
+    if (document.getElementById('accVisual').checked) accs.push('Visual Scaffolding');
+    return accs;
+  }
+
+  function generatePhase1Prompt() {
+    const subjectTopic = document.getElementById('subjectTopic').value.trim();
+    if (!subjectTopic) {
+      alert('Please enter a Subject & Topic.');
+      return;
+    }
+
+    const gradeBand = document.getElementById('gradeBand').value;
+    const purpose = document.getElementById('purpose').value;
+    const targetDok = document.getElementById('targetDok').value;
+    
+    const targetStandardInput = document.getElementById('targetStandard').value.trim();
+    const targetStandard = targetStandardInput ? targetStandardInput : 'Not Specified';
+    
+    const accommodations = getSelectedAccommodations();
+    const accText = accommodations.length > 0 ? accommodations.join(', ') : 'None Selected';
+
+    // STATE LOCK: Snapshot form state into currentPhase1Data
+    currentPhase1Data = {
+      gradeBand,
+      purpose,
+      subjectTopic,
+      targetDok,
+      targetStandard,
+      accText
+    };
+
+    const prompt = `You are an AI assessment generator operating under the NEPM Framework (US Edition v1.0).
+Generate a Teacher's Master Sheet based strictly on the following parameters:
+
+[ASSESSMENT PARAMETERS]
+- Grade Band: ${currentPhase1Data.gradeBand}
+- Subject & Topic: ${currentPhase1Data.subjectTopic}
+- Purpose: ${currentPhase1Data.purpose}
+- Target Standard: ${currentPhase1Data.targetStandard}
+- Target DOK: ${currentPhase1Data.targetDok}
+- Accommodations: ${currentPhase1Data.accText}
+
+[CORE GUARDRAILS - STRICT COMPLIANCE REQUIRED]
+1. RULE 1 (No Fake Standards): If Target Standard is "Not Specified", DO NOT guess, infer, or fabricate any Common Core, TEKS, NGSS, or state standard codes.
+2. RULE 2 (No Auto-Accommodation): Apply ONLY the explicitly requested Accommodations listed above. Do NOT invent or add unrequested accommodations.
+3. RULE 3 (No PII): Do not request or include any Student Names, Student IDs, IEP details, or 504 records.
+4. RULE 4 (No Fake Sources): Do not cite unreferenced laws, research, or standard documents.
+5. RULE 5 (Human Approval Gate): Output ONLY Phase 1 (Teacher's Master Sheet) now. STOP. Do NOT generate the Student Sheet even if the user says "APPROVE".
+6. RULE 6 (Unknown Means Unknown): If details are missing, do not make arbitrary assumptions.
+7. RULE 7 (DOK Boundary): Target DOK represents the educator's intended cognitive complexity, not a difficulty rating. Use the selected Target DOK to guide item design. Do NOT label individual questions with DOK levels, and do NOT present any AI-generated DOK classification as a verified determination. DOK alignment is reviewed by the teacher, not certified by you.
+
+[OUTPUT FORMAT - PHASE 1: TEACHER'S MASTER SHEET]
+Provide a structured Master Sheet containing:
+1. Header Info (Grade, Subject/Topic, Purpose, Target Standard, Target DOK)
+2. Question Items with Answer Keys
+3. Concise Explanations for Answers
+4. Short Rubric (if written response items are present)
+5. Record of Applied Accommodations
+
+END OF PHASE 1 GENERATION. At the bottom of your output, explicitly state:
+"Please review this Master Sheet. Request any adjustments, or reply 'APPROVE' to finalize the Master Sheet content ONLY. (DO NOT generate the Student Sheet until you receive the official Phase 2 Authorization Prompt)."`;
+
+    document.getElementById('phase1Output').value = prompt;
+    document.getElementById('phase1Card').style.display = 'block';
+    document.getElementById('phase1Card').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Shape Check != Identity Verification. Artifact identity remains educator-owned.
+  function validateMasterSheetShape(text) {
+    const errors = [];
+
+    // Host-side coarse shape guard only. This does NOT validate assessment quality.
+    if (text.length < 150) {
+      errors.push('The content is too short. Please confirm that the full approved Teacher Master Sheet was pasted.');
+    }
+
+    // Distinguish explicit question-item structures from generic numbered-list lines.
+    const explicitItemPattern = /(^\s*\|\s*\d+\s*\|)|(\bItem\s+\d+\b)|(\bQuestion\s+\d+\b)/gim;
+    const numberedListPattern = /^\s*\d+\.\s+/gim;
+    const explicitMatches = text.match(explicitItemPattern) || [];
+    const numberedMatches = text.match(numberedListPattern) || [];
+    if (explicitMatches.length < 1 && numberedMatches.length < 2) {
+      errors.push('No recognizable question-item structure was found. Single-item assessments should use an explicit "Item 1" or "Question 1" format.');
+    }
+
+    // Teacher-side answer information is required as a shape signal, not as a quality judgment.
+    const answerPattern = /\banswer\s*key\b|\bexplanation\b|\banswer\s*:/i;
+    if (!answerPattern.test(text)) {
+      errors.push('No Answer Key / Explanation signal was found.');
+    }
+
+    return errors;
+  }
+
+  function generatePhase2Prompt() {
+    const masterSheetContent = document.getElementById('masterSheetInput').value.trim();
+
+    if (!masterSheetContent) {
+      alert('Please paste the finalized Teacher Master Sheet content first.');
+      return;
+    }
+
+    // ARTIFACT IDENTITY BOUNDARY:
+    // - Artifact identity and approval are owned by the educator.
+    // - Host-side validation checks minimum structural signals only.
+    // - Shape PASS does not establish artifact identity, approval validity, correctness, or assessment quality.
+    // - Shape Check != Identity Verification.
+    // HOST-SIDE PAYLOAD SHAPE GUARD: fail closed before Phase 2 authorization.
+    const shapeErrors = validateMasterSheetShape(masterSheetContent);
+    if (shapeErrors.length > 0) {
+      alert(
+        'This does not appear to contain the minimum shape of a complete approved Teacher Master Sheet:\n\n- ' +
+        shapeErrors.join('\n- ') +
+        '\n\nPlease paste the full approved Master Sheet. This check validates minimum structure only. It does not verify that this is the correct or approved Master Sheet.'
+      );
+      return;
+    }
+
+    // STATE LOCK GUARD: Verify Phase 1 snapshot exists and hasn't been invalidated
+    if (!currentPhase1Data) {
+      alert('Phase 1 configuration is missing or has been changed.\nPlease generate the Phase 1 prompt again to lock the current setup parameters before proceeding to Phase 2.');
+      return;
+    }
+
+    // Read ONLY from locked snapshot
+    const {
+      gradeBand,
+      purpose,
+      subjectTopic,
+      targetDok,
+      targetStandard
+    } = currentPhase1Data;
+
+    // Generate a simple, non-security authorization marker (Timestamp-based)
+    const authMarker = "AUTH-" + Date.now().toString(36).toUpperCase();
+
+    const prompt = `[PHASE 2 AUTHORIZATION TICKET: ${authMarker}]
+You are an AI assessment generator operating under the NEPM Framework (US Edition v1.0).
+Convert the approved Teacher's Master Sheet into a formatted Student Test Sheet.
+
+[ORIGINAL PARAMETERS (LOCKED FROM PHASE 1)]
+- Grade Band: ${gradeBand}
+- Subject & Topic: ${subjectTopic}
+- Purpose: ${purpose}
+- Target Standard: ${targetStandard}
+- Target DOK: ${targetDok}
+
+[APPROVED TEACHER MASTER SHEET]
+${masterSheetContent}
+
+[PHASE 2 OUTPUT ELEMENT BOUNDARY]
+- PRESERVE: Approved Master Sheet question items, core concepts, target skills, numerical values, and student-facing content explicitly present in the approved Master Sheet.
+- REMOVE: Answer Keys, Teacher Explanations, Grading Rubrics, Grade Band, Subject & Topic, Purpose, Target Standard, Target DOK, accommodation records, teacher-only metadata, and workflow meta-text such as "Please review this Master Sheet."
+- MAY ADD (ALLOW LIST): ONLY:
+  1. A basic "Name: _____" and "Date: _____" header.
+  2. Unlabeled blank response space consisting only of blank lines, underscores, or visual separator lines.
+- MUST NOT ADD: Any new instructional or descriptive text not explicitly present in the approved Master Sheet, including:
+  - directions
+  - hints
+  - solution guidance
+  - step frames
+  - new instruction sentences
+  - new response labels such as "Answer:", "Show your work:", or "Explain:" (if they were not explicitly present in the approved Master Sheet)
+  - headings, titles, or introductory lines such as "Student Test Sheet", "Directions", or a restated subject/topic title
+  - any other learning content or student-facing text
+  Not explicitly allowed above = Do not add.
+
+[OUTPUT FORMAT - PHASE 2: STUDENT TEST SHEET]
+Output ONLY the final Student Test Sheet. Do not include introductory conversational text.`;
+
+    document.getElementById('phase2Output').value = prompt;
+    document.getElementById('phase2OutputArea').style.display = 'block';
+    document.getElementById('phase2OutputArea').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copyToClipboard(elementId, statusId) {
+    const textarea = document.getElementById(elementId);
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        showCopyStatus(statusId, 'Copied to clipboard!');
+      }).catch(() => {
+        fallbackCopy(textarea, statusId);
+      });
+    } else {
+      fallbackCopy(textarea, statusId);
+    }
+  }
+
+  function fallbackCopy(textarea, statusId) {
+    try {
+      document.execCommand('copy');
+      showCopyStatus(statusId, 'Copied to clipboard!');
+    } catch (err) {
+      showCopyStatus(statusId, 'Selected! Press Ctrl+C (Cmd+C) to copy.');
+    }
+  }
+
+  function showCopyStatus(statusId, text) {
+    const statusEl = document.getElementById(statusId);
+    statusEl.innerText = text;
+    statusEl.style.display = 'block';
+    setTimeout(() => {
+      statusEl.style.display = 'none';
+    }, 3000);
+  }
+</script>
+</body>
+</html>
